@@ -1,5 +1,6 @@
 import { BrowserRouter } from 'react-router-dom'
 
+import { SnackProvaider } from './contexts/SnackContext'
 import { AppRoutes } from './routes'
 
 import { Theme } from './styles/Theme'
@@ -10,9 +11,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Theme>
-        <AppRoutes />
-        <GlobalStyle />
-        <Normalize />
+        <SnackProvaider>
+          <AppRoutes />
+          <GlobalStyle />
+          <Normalize />
+        </SnackProvaider>
       </Theme>
     </BrowserRouter>
   )

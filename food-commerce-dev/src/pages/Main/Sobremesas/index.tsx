@@ -1,48 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useSnack } from '../../../hooks/useSnack'
 
 import { Head } from '../../../components/Head'
 import { SnackTitle } from '../../../components/SnackTitle'
 import { Snacks } from '../../../components/Snacks'
 
-import { getSobremesas } from '../../../services/api'
-
 export default function Sobremesas() {
-  const [sobremesas, setSobremesas] = useState([])
-
-  useEffect(() => {
-    ;(async () => {
-      const sobremesasRequest = await getSobremesas()
-
-      setSobremesas(sobremesasRequest.data)
-    })()
-  }, [])
-
-  // const data = [
-  //   {
-  //     id: 1,
-  //     snack: 'sobremesas',
-  //     name: 'Casquinha',
-  //     description: 'A casquinha crocante e saborosa que nossa cliente amam.',
-  //     price: 4.5,
-  //     image: 'https://i.imgur.com/YGmeoCm.jpg',
-  //   },
-  //   {
-  //     id: 2,
-  //     snack: 'sobremesas',
-  //     name: 'Chocolate com granulado',
-  //     description: 'Sorvete de chocolate com granulado em chocolate para você se deliciar.',
-  //     price: 6.5,
-  //     image: 'https://i.imgur.com/osAHOLe.jpg',
-  //   },
-  //   {
-  //     id: 3,
-  //     snack: 'sobremesa',
-  //     name: 'Flocos',
-  //     description: 'O tradicional flocos vem com cobertura em chocolate para adocicar seu dia.',
-  //     price: 7,
-  //     image: 'https://i.imgur.com/qgnFLiy.jpg',
-  //   },
-  // ]
+  const { sobremesas } = useSnack()
   return (
     <>
       <Head title='Sobremesas' />
