@@ -1,6 +1,10 @@
 import { createContext, useState, useEffect, ReactNode } from 'react'
+import { toast } from 'react-toastify'
+
 import { SnackData } from '../interfaces/SnackData'
-import { create } from 'domain'
+// import { create } from 'domain'
+
+import { snackEmoji } from '../helpers/snackEmoji'
 
 interface Snack extends SnackData {
   quantity: number
@@ -35,10 +39,34 @@ export function CartProvider({ children }: CartProviderProps) {
   const [cart, setCart] = useState<Snack[]>([])
 
   function addSnackIntoCart(snack: SnackData): void {
+    //buscar
+    const snackExistentIncart = cart.find(
+      (item) => item.snack === snack.snack && item.id === snack.id,
+    )
+
+    //atualizar
+    if (snackExistentIncart) {
+      const newCart = cart.map((item) => {
+        if (item.id === snack.id) {
+          const quantity = item.quantity + 1
+          const subtotal = item.price * quantity
+
+          return { ...item, quantity, subtotal }
+        }
+
+        return item
+      })
+
+      toast.success(`Outro(a)${snackEmoji(snack.snack)} ${snack.name} adicionado nos pedidos!`)
+      setCart(newCart)
+
+      return
+    }
+
     const newSnack = { ...snack, quantity: 1, subtotal: snack.price }
     const newCart = [...cart, newSnack]
 
-    console.log(`newCart`, newCart)
+    toast.success(`${snackEmoji(snack.snack)} ${snack.name} adicionado nos pedidos!`)
 
     setCart(newCart)
   }
