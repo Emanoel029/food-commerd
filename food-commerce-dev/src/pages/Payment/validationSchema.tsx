@@ -1,13 +1,12 @@
 import { isValidCNPJ, isValidCPF, isValidPhone } from '@brazilian-utils/brazilian-utils'
 import isValidCreditCard from 'card-validator'
-// import { Certificate } from 'crypto'
 import * as yup from 'yup'
 
 export const schema = yup
   .object({
     fullName: yup
       .string()
-      .required('O nome é obrigatórios.')
+      .required('O nome é obrigatório.')
       .min(3, 'O nome deve ser completo.')
       .matches(/(\w.+\s).+/gi, 'O nome deve conter o sobrenome.'),
     email: yup.string().required('O email é obrigatório.').email('O email deve ser válido.'),
@@ -15,8 +14,7 @@ export const schema = yup
       .string()
       .required('O celular é obrigatório.')
       .transform((value) => value.replace(/[^\d]/g, ''))
-      .test('validatMobile', 'O celular inválido.', (value) => isValidPhone(value)),
-
+      .test('validateMobile', 'O celular inválido.', (value) => isValidPhone(value)),
     document: yup
       .string()
       .required('O CPF/CNPJ é obrigatório.')
@@ -42,7 +40,7 @@ export const schema = yup
       .transform((val) => val.replace(/[^\d]+/g, ''))
       .test(
         'validateCreditCardNumber',
-        'O numero do cartão é inválido.',
+        'O número do cartão é inválido.',
         (value) => isValidCreditCard.number(value).isValid,
       ),
     creditCardHolder: yup
@@ -52,7 +50,7 @@ export const schema = yup
       .matches(/(\w.+\s).+/gi, 'O nome do titular deve conter o sobrenome.'),
     creditCardExpiration: yup
       .string()
-      .required('A data de validade é obrigatória.')
+      .required('A data de validate é obrigatória.')
       .transform((value) => {
         const [month, year] = value.split('/')
 
@@ -63,7 +61,7 @@ export const schema = yup
       })
       .test(
         'validateCreditCardExpiration',
-        'A data de validade é inválida.',
+        'A data de validate é inválida.',
         (value) => new Date(value) >= new Date(),
       ),
     creditCardSecurityCode: yup
@@ -74,4 +72,5 @@ export const schema = yup
       .max(4, 'O CVV deve possuir entre 3 e 4 dígitos.'),
   })
   .required()
+
 export type FieldValues = yup.InferType<typeof schema>
