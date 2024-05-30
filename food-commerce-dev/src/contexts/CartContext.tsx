@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode } from 'react'
+import { createContext, ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -14,7 +14,7 @@ interface Snack extends SnackData {
 
 interface CartContextProps {
   cart: Snack[]
-  addSnackIntoCart: (sanck: SnackData) => void
+  addSnackIntoCart: (snack: SnackData) => void
   removeSnackFromCart: (snack: Snack) => void
   snackCartIncrement: (snack: Snack) => void
   snackCartDecrement: (snack: Snack) => void
@@ -32,21 +32,29 @@ const localStorageKey = '@FoodCommerce:cart'
 
 export function CartProvider({ children }: CartProviderProps) {
   const navigate = useNavigate()
-  const [cart, setCart] = useState<Snack[]>([])
+  const [cart, setCart] = useState<Snack[]>(() => {
+    const value = localStorage.getItem(localStorageKey)
+
+    if (value) return JSON.parse(value)
+
+    return []
+  })
 
   function saveCart(items: Snack[]) {
     setCart(items)
     localStorage.setItem(localStorageKey, JSON.stringify(items))
   }
 
+  function clearCart() {
+    localStorage.removeItem(localStorageKey)
+  }
+
   function addSnackIntoCart(snack: SnackData): void {
-    //buscar
-    const snackExistentIncart = cart.find(
+    const snackExistentInCart = cart.find(
       (item) => item.snack === snack.snack && item.id === snack.id,
     )
 
-    //atualizar
-    if (snackExistentIncart) {
+    if (snackExistentInCart) {
       const newCart = cart.map((item) => {
         if (item.id === snack.id) {
           const quantity = item.quantity + 1
@@ -58,17 +66,16 @@ export function CartProvider({ children }: CartProviderProps) {
         return item
       })
 
-      toast.success(`Outro(a)${snackEmoji(snack.snack)} ${snack.name} adicionado nos pedidos!`)
+      toast.success(`Outro(a) ${snackEmoji(snack.snack)} ${snack.name} adicionado nos pedidos!`)
       saveCart(newCart)
 
       return
     }
 
     const newSnack = { ...snack, quantity: 1, subtotal: snack.price }
-    const newCart = [...cart, newSnack]
+    const newCart = [...cart, newSnack] // push de um array
 
     toast.success(`${snackEmoji(snack.snack)} ${snack.name} adicionado nos pedidos!`)
-
     saveCart(newCart)
   }
 
@@ -81,19 +88,21 @@ export function CartProvider({ children }: CartProviderProps) {
   function updateSnackQuantity(snack: Snack, newQuantity: number) {
     if (newQuantity <= 0) return
 
-    const snackExistentIncart = cart.find(
+    const snackExistentInCart = cart.find(
       (item) => item.id === snack.id && item.snack === snack.snack,
     )
 
-    if (!snackExistentIncart) return
+    if (!snackExistentInCart) return
+
     const newCart = cart.map((item) => {
-      if (item.id === snackExistentIncart.id && item.snack === snackExistentIncart.snack) {
+      if (item.id === snackExistentInCart.id && item.snack === snackExistentInCart.snack) {
         return {
           ...item,
           quantity: newQuantity,
           subtotal: item.price * newQuantity,
         }
       }
+
       return item
     })
 
@@ -109,12 +118,14 @@ export function CartProvider({ children }: CartProviderProps) {
   }
 
   function confirmOrder() {
-    navigate('/pyment')
+    navigate('/payment')
   }
 
   function payOrder(customer: CustomerData) {
     console.log('payOrder', cart, customer)
-    //chamada de AIP para back-end
+    // chamada de API para o backend
+    clearCart() // deve ser executado após retorno positivo da API
+
     return
   }
 
